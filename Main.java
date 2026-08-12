@@ -87,6 +87,7 @@ while(true){
         }
 
         if(version ==2){
+            a = new int[120][59];
             for(int k = 0; k < a.length; k++){
                 for( int j = 0; j< a[0].length; j++){
                     a[k][j]=0xFFFFFF;
