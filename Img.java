@@ -12,14 +12,14 @@ public class Img extends JPanel {
     double scale;
     JLabel label;
 
-    public Img(int[][] img, int rgb, boolean autofill){
+    public Img(int[][] img, int rgb, boolean autofill, int brushsize, boolean shouldScale){
      // int z =1000 / Math.max(img[0].length, img.length);
       //  if(z<1){z=1;}
         this.scale = Math.min(1000.0/img[0].length,  1000.0/img.length);
         this.color = rgb;
         this.pic = img;
         this.image = new BufferedImage(pic.length, pic[0].length, BufferedImage.TYPE_INT_RGB);
-        label = new JLabel(new ImageIcon( scaleImage(image, scale) ));
+        label = new JLabel(new ImageIcon( scaleImage(image, scale, shouldScale) ));
 
         label.addMouseMotionListener(new MouseAdapter() {
 
@@ -27,7 +27,12 @@ public class Img extends JPanel {
             public void mouseDragged(MouseEvent e){
                 int x = (int) (e.getX() / scale);
                 int y = (int) (e.getY()/ scale);
-                setPixel(x,y,color);
+                int half = brushsize / 2;
+                for(int u = -half; u <= half; u++) {
+                for (int w = -half; w <= half; w++) {
+                   setPixel(x + w, y + u, color, shouldScale);
+                }
+                }
             }}); // END OF MOUSEMOTIONLISTENER
         
                                     
@@ -38,12 +43,17 @@ public class Img extends JPanel {
                 int x = (int) (e.getX() /scale);
                 int y = (int) (e.getY()/ scale);
                 //System.out.println("else if(x=="+x+" && y =="+ y+"){a[x][y]=0xFF0000;}");
-                setPixel(x,y,color);
+                 int half = brushsize / 2;
+                for(int u = -half; u <= half; u++) {
+                for (int w = -half; w <= half; w++) {
+                   setPixel(x + w, y + u, color, shouldScale);
+                }
+                }
             }else{
                       int x = (int) (e.getX() /scale);
                 int y = (int) (e.getY()/ scale);
                // System.out.println("else if(x=="+x+" && y =="+ y+"){a[x][y]=0xFF0000;}");
-                autofill(x,y,color, img[x][y]);
+                autofill(x,y,color, img[x][y], shouldScale);
             }
             
             }
@@ -61,13 +71,15 @@ public class Img extends JPanel {
                 else{ image.setRGB(x, y, pic[x][y]); }
             }
         } //calculation of every pixel done.
-        // image = scaleImage(image, 100);
-        label.setIcon(new ImageIcon(scaleImage(image, scale)));
+        // image = scaleImage(image, 100, true);
+        label.setIcon(new ImageIcon(scaleImage(image, scale, true)));
         intoImage(image);
     }
 //____________________________________________________________________________________________________________________________________
 
-    public BufferedImage scaleImage(BufferedImage old, double by){
+    public BufferedImage scaleImage(BufferedImage old, double by, boolean shouldScale){
+
+        if(!shouldScale){return old;}
         int newWidth = (int) Math.max(1, old.getWidth() * by);
          int newHeight = (int) Math.max(1, old.getHeight() * by);
 
@@ -111,22 +123,32 @@ public class Img extends JPanel {
         frame.setVisible(true);
     }
 
-    public void setPixel(int x, int y, int color){
+    public void setPixel(int x, int y, int color, boolean shouldScale){
         pic[x][y] = color;
         image.setRGB(x,y,color);
 
-        label.setIcon(new ImageIcon(scaleImage(image, scale)));
-        IntoFile.saveImage(this.pic);
+     label.setIcon(new ImageIcon(scaleImage(image, scale, shouldScale )));
+      //  IntoFile.saveImage(this.pic);
     }
 //_________________________________________________________________________________________________________________________________________
-    public static int[][] addLeft(int[][] png, int bits){
+    public static int[][] addLeft(int[][] png, int bits , boolean copyColor){
+       // int color00 = png[0][ png[0].length / 2];
 int[][] res = new int[png.length + bits][png[0].length];
         for (int h=0; h<png[0].length; h++){
     for(int w=0; w < png.length; w++ ){ 
         res[w+bits][h] = png[w][h];
     }
 }
-        return res;
+        //sets new bits same as color in [0][0]
+
+        // commenting this out would set all new bits as the one they were befor
+    if(copyColor){   for (int h = 0; h < res[0].length; h++) {
+        for (int w = 0; w < (res.length-png.length); w++) {
+          //  res[w][h] = color00;
+            res[w][h] = png[0][h];
+        } } }
+          return res;
+    
     }
 //_______________________________________________________________________________________________________________________________________________
 public static int[][] deleteLeft(int[][] png, int bits){
@@ -138,14 +160,24 @@ int[][] res = new int[png.length - bits][png[0].length];
 }
         return res;
     }//_________________________________________________________________________________________________________________________________________
-    public static int[][] addRight(int[][] png, int bits){
+    public static int[][] addRight(int[][] png, int bits , boolean copyColor){
+     //   int color00 = png[png.length-1][png[0].length / 2];
 int[][] res = new int[png.length + bits][png[0].length];
         for (int h=0; h<png[0].length; h++){
     for(int w=0; w < png.length; w++ ){ 
         res[w][h] = png[w][h];
     }
 }
+        
+          //sets new bits same as color in [0][0]
+      if(copyColor){  for (int h = 0; h < res[0].length; h++) {
+        for (int w = png.length; w < res.length; w++) {
+         //   res[w][h] = color00;
+            res[w][h]= png[ png.length - 1][h];
+        }
+        }  }
         return res;
+    
     }
 //_______________________________________________________________________________________________________________________________________________
 public static int[][] deleteRight(int[][] png, int bits){
@@ -168,23 +200,42 @@ int[][] res = new int[png.length][png[0].length - bits];
         return res;
     }
     //___________________________________________________________________________________________________________________________________
-    public static int[][] addUp(int[][] png, int bits){
+    public static int[][] addUp(int[][] png, int bits , boolean copyColor){
+       //  int color00 = png[png.length /2][0];
 int[][] res = new int[png.length][png[0].length + bits];
         for (int h=0; h<png[0].length; h++){
     for(int w=0; w < png.length; w++ ){ 
         res[w][h+bits] = png[w][h];
     }
 }
+    
+        //sets new bits same as color in [0][0]
+ if(copyColor){      for (int h = 0; h < bits; h++) {
+        for (int w = 0; w < res.length; w++) {
+           // res[w][h] = color00;
+            res[w][h] = png[w][0];
+        }
+    } }
         return res;
     }
      //___________________________________________________________________________________________________________________________________
-    public static int[][] addDown(int[][] png, int bits){
+    public static int[][] addDown(int[][] png, int bits , boolean copyColor){
+    //    int color00 = png[png.length/2][png[0].length-1];
 int[][] res = new int[png.length][png[0].length + bits];
         for (int h=0; h<png[0].length; h++){
     for(int w=0; w < png.length; w++ ){ 
         res[w][h] = png[w][h];
     }
 }
+
+        //sets new bits same as color in [0][0]
+if(copyColor){   for (int h = png[0].length; h < res[0].length; h++) {
+        for (int w = 0; w < res.length; w++) {
+            //res[w][h] = color00;
+            res[w][h] = png[w][png[0].length -1];
+        }
+    } }
+        
         return res;
     }
     //___________________________________________________________________________________________________________________________________
@@ -199,14 +250,14 @@ int[][] res = new int[png.length][png[0].length - bits];
     }
       //___________________________________________________________________________________________________________________________________
 
-public void autofill(int x, int y, int color, int myColor){
+public void autofill(int x, int y, int color, int myColor, boolean shouldScale){
 if(pic[x][y]!=myColor){return;}
     if(pic[x][y]==color){return;}
     else{
-        this.setPixel(x,y,color);
-if(x< pic.length-1){ autofill(x+1,y,color,myColor);}
- if(x>0){ autofill(x-1,y,color, myColor);}
- if(y< pic[0].length-1) {autofill(x,y+1,color,myColor);}
- if(y>0){ autofill(x,y-1,color,myColor);}}
+        this.setPixel(x,y,color, shouldScale);
+if(x< pic.length-1){ autofill(x+1,y,color,myColor, shouldScale);}
+ if(x>0){ autofill(x-1,y,color, myColor, shouldScale);}
+ if(y< pic[0].length-1) {autofill(x,y+1,color,myColor, shouldScale);}
+ if(y>0){ autofill(x,y-1,color,myColor, shouldScale);}}
     }
 }
