@@ -1,0 +1,113 @@
+This is manual. If you do not understand what to do, you can scroll down to examples and just copy paste. 
+
+____________________________________________________________________________________________________________________
+first step: 
+
+to compile (aka make it a runnable), enter: 
+javac Main.java IntoFile.java Img.java Predefined.java Stat.java Transcribe.java Refactor.java Func.java ChangeColor.java IntoBlackWhite.java CombineTwoPics.java
+
+then, to run normal editor: 
+java Main
+
+_____________________________________________________________________________________________________________________
+. runnables:  Main, Stat, Transcribe, Refactor, Func, Predefined, ChangeColor, IntoBlackWhite, CombineTwoPics
+
+Main       =  main Program. Allows you to edit on a picture, which will be saved into the file named "drawn.png"
+Stat       =  displays Program size info. You can set the flas -s <number>, then the program will increase the size of each bit inside "drawn.png" by some value 
+Transcribe =  Program which prints the bits of one specific colour (see flags, default is red) inside "template.png"  onto  "drawn.png" . 
+              Automatically scales the smaller image until as big as possible without overflow.
+Refactor   = Can increase/decrease png size using the flags (see below)
+Func       = calculates a function (currently Mandelbrot) and saves it into "func.png"
+Predefined = needs to be overridden. It currently hides all red bits inside "template.png" ; should never be used unless checked first
+ChangeColor -f <number> -t <number> = change all color bits that are -f to have color -t inside "drawn.png"
+IntoBlackWhite = turns your image into PURE black and white based on brightness
+CombineTwoPics = takes in drawn.png and template.png and saves the result into drawn.png
+
+(to run each, do 
+java <name>
+ inside console)
+_____________________________________________________________________________________________________________________
+
+Flags:      
+
+Main -q             // -q starts immediately and ignores others : random color, new file of template, no autofill
+Main -o             // setting this flag will run the old file (drawn.png). Not setting this means the old file gets lost.  
+Main -a             // setting -a will enable autofill
+Main -c <HEXnumber> // setting -c number will set the Color  . . . NUMBER MUST BE IN HEXADECIMAL WITHOUT THE LEADING 0x
+Main -b <number>    // setting the brushsize.  Brushsize = a square around the point you click. 
+Main -s             // whether to scale the image. Scaling image costs time, but if your picture is only a few bit big, it is worth it.
+
+Main default before using any flags: new file, random color, no autofill, brush size = 10
+
+
+Stat -t <Name of File>    // will do all changes on the file specified in name
+Stat -q <number>          // will increase size of each bit in the picture by <number> times . Negative numbers shrink the size.
+Stat -w <number> <number> // each bit: first param specifies x increase. second param sspecifies y increase. Negative numbers shrink the size.
+Stat default: displays array size info . Does not resize anything if not specified.
+
+Transcribe -c <HEXnumber> // number should be the rgb number in Hexadecimal form of the color. It will map all bits inside "template.png" onto "drawn.png"
+Transcribe -v             // if set, the color of each bit affected inside the "drawn.png" will be inversed.
+                          // If not set, then will map original color (specified in -c or red)
+Trenscribe -s             // with -s set, the program will not enlarge any pictures and only copy as much as both overlap
+Transcribe default: maps the red (FF0000) bits of "template.png" . will be same color on "default.png" as well. 
+
+Refactor -b                  // wihtout it, the new picture have the same color as the bits on the outer edge, if you set it, they will just be black. 
+Refactor -d <Decimal number> // negative number deletes from down, positive number adds to down    . affects "drawn.png"
+Refactor -u <Decimal number> // negative number deletes from up, positive number adds to up        . affects "drawn.png"
+Refactor -l <Decimal number> // negative number deletes from left, positive number adds to left    . affects "drawn.png"
+Refactor -r <Decimal number> // negative number deletes from right, positive number adds to right  . affects "drawn.png"
+Refactor -t <String>         // will do all changes on the file specified in name
+
+ChangeColor -f <HexNumber> -t <HexNumber> // changes colouring of every bit that has -f to the colour specified in -t 
+default is from black to black (0x000000)
+____________________________________________________________________________________________________________________
+
+examples: 
+
+java Main
+
+java Main -q
+
+java Main -o -c FF00F0 -a -b 20 -s 
+
+java Main -s -c 00FF8F 
+
+java Main -c FF00F0 -b 3
+
+java Transcribe 
+
+java Transcribe -c FFFFFF
+
+java Transcribe -c FFFFFF -v
+
+java Stat
+
+java Stat -i
+
+java Stat -q 4
+
+java Stat -w -4 2
+
+java Stat -t template.png -q -4
+
+java Refactor -d -20 -u 30 -l -40 -r 50
+
+java Refactor -t template.png -d 20
+
+java ChangeColor -f 07F0FF -t FF0000
+
+java IntoBlackWhite
+
+java CombineTwoPics
+
+
+__________________________________________________________________________________________________________________________
+
+saving: your data will be located inside "drawn.png" . Save it by renaming the file. 
+besides "drawn.png" , there is "template.png" . It is only used in Transcribe. 
+
+__________________
+the HEX Numbers for the colours are in 
+cat colours.txt
+
+______________________________
