@@ -1,0 +1,29 @@
+Here are the colours used:
+
+r= red. o= orange. y= yellow. x=dark yellow. l= lightgreen. 
+g= green. s= springgreen. c= cyan. a=azure. 
+b= blue. v=violet. e=light purple. i=purple. m=magenta. d=rose. w=white. n=black.
+p= pink. f=olive. t=brown. q=random.
+
+case 'r': m=0xFF0000; 
+case 'o': m=0xFF7F00; 
+case 'y': m=0xFFFF00; 
+case 'l': m=0x7FFF00; 
+case 'g': m=0x008000; 
+case 's': m=0x00FFF0; 
+case 'c': m=0x00FFFF; 
+case 'a': m=0x07F0FF; 
+case 'b': m=0x0000FF; 
+case 'x': m=0xFFCC33; 
+case 'v': m=0x7F00FF; 
+case 'e': m=0x9999FF; 
+case 'i': m=0x4B0082; 
+case 'm': m=0xFF00FF; 
+case 'd': m=0xFF007F; 
+case 'n': m=0x000000; 
+case 'w': m=0xFFFFFF; 
+case 'p': m=0xFC0FC0; 
+case 'f': m=0x556B2F;
+case 't': m=0x895129;
+
+_________________________________________________________________________________________
